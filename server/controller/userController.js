@@ -3,7 +3,9 @@ const userHelper = require('../helpers/userHelper');
 const userModel = require('../model/userModel');
 const bcrypt = require('bcrypt');
 const tokenHelper = require('../helpers/tokenHelper');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const postModel = require('../model/postModel');
+const { default: mongoose } = require('mongoose');
 // Temperory Storage for User Details.
 let userPendingForSignup;
 
@@ -80,6 +82,109 @@ module.exports ={
         }
     },
 
-    // ---------------------------------------------------------------REFRESH TOKEN----------------------------------------------------------------------------
+    // ------------------------------------------------------------------ADD POST----------------------------------------------------------------------------
+
+    addPost: async(req,res)=>{
+        try {
+            const userId = req.userDetails._id;
+            const imageUrl = req.body.imageUrl;
+            const discription = req.body.discription;
+            const postDetails = {userId,imageUrl,discription};
+            const createPost = new postModel(postDetails);
+            const posted = createPost.save();
+            if(!posted) return res.status(404).json({message:"Unable to post your picture"});
+            res.status(200).json({message:"Posted Successfully"})
+        } catch (error) {
+            res.status(500).json({message:"Internal Server Error"})
+        }
+    },
+
+    // ------------------------------------------------------------------ADD COMMENT----------------------------------------------------------------------------
+
+    addComment : async(req,res)=>{
+        try {
+            const userId = req.userDetails._id;
+            const commentText = req.body.commentText
+            const postId = req.body.postId
+            const commentDetails = {userId,commentText}
+            const addComment = await postModel.findOneAndUpdate({_id:postId},{$push:{comments:commentDetails}});
+            if(!addComment) return res.status(404).json({message:"unable to add comment"})
+            res.status(200).json({message:"Comment Added Successfully"})
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({message:"Internal Server Error"})
+        }
+    },
+
+    // ------------------------------------------------------------------Like Comment----------------------------------------------------------------------------
+
+    likeComment: async(req,res)=>{
+        try {
+            // requiring Values
+            const commentId = req.body.commentId;
+            const postId = req.body.postId;
+            const userId = req.userDetails._id; 
+            const likeComment = await userHelper.likeComment(commentId,postId,userId)
+            if(likeComment){
+                res.status(200).json({message:"comment liked Successfully"})
+            }else{
+                res.status(401).json({message:"Already like the comment"})
+            }
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({message:"Internal Server Error"})
+        }
+    },
+
+    // ------------------------------------------------------------------Unlike the Comment----------------------------------------------------------------------------
+
+    unlikeComment: async(req,res)=>{
+        try {
+            // requiring Values
+            const commentId = req.body.commentId;
+            const postId = req.body.postId;
+            const userId = req.userDetails._id; 
+            const unlikeComment = await userHelper.unlikeComment(commentId,postId,userId)
+            if(unlikeComment){
+                res.status(200).json({message:"comment Unliked Successfully"})
+            }else{
+                res.status(401).json({message:"Already Unliked the comment"})
+            }
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({message:"Internal Server Error"})
+        }
+    },
+
+    // ------------------------------------------------------------------Like The Post----------------------------------------------------------------------------
+
+    likePost: async(req,res)=>{
+        try {
+            const postId = req.body.postId
+            const userId = req.userDetails._id
+            const likePost = await postModel.findOneAndUpdate({_id:postId,likes:{$ne:userId}},{$addToSet:{likes:userId}})
+            if(likePost) return res.status(200).json({message:"You liked this Post"});
+            else return res.status(401).json({message:"You have already like this Post"})
+        } catch (error) {
+            res.status(500).json({message:"Internal Server Error"})
+        }
+    },
+
+    // ------------------------------------------------------------------UnLike The Post----------------------------------------------------------------------------
+
+    unlikePost: async(req,res)=>{
+        try {
+            const postId = req.body.postId;
+            const userId = req.userDetails._id;
+            const unlikePost = await postModel.findOneAndUpdate({_id:postId,likes:userId},{$pull:{likes:userId}});
+            if(unlikePost) res.status(200).json({message:"You've Unliked the Post"})
+            else return res.status(401).json({message:"You have Already unliked the Post"})
+        } catch (error) {
+            res.status(500).json({message:"Internal Server Error"})
+        }
+    },
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------------
+
 
 };
