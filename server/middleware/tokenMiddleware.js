@@ -13,7 +13,6 @@ module.exports={
                 const tokenVerified = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET_KEY);
                 req.userDetails =  await userModel.findOne({_id:tokenVerified._id});
                 if(!req.userDetails) return res.status(404).json({message:"User Not Found"});
-                console.log(req.userDetails)
                 next()
             } catch (error) {
                 res.status(401).json({message:"Token Expired Please Login Again"});

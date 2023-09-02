@@ -5,7 +5,6 @@ const bcrypt = require('bcrypt');
 const tokenHelper = require('../helpers/tokenHelper');
 const jwt = require('jsonwebtoken');
 const postModel = require('../model/postModel');
-const { default: mongoose } = require('mongoose');
 // Temperory Storage for User Details.
 let userPendingForSignup;
 
@@ -184,7 +183,149 @@ module.exports ={
         }
     },
 
-    // ----------------------------------------------------------------------------------------------------------------------------------------------
+    // ------------------------------------------------------------------Getting all Users--------------------------------------------------------------------------
+
+    getUsers:async(req,res)=>{
+        try {
+            const users  = await userModel.find()
+            res.status(200).json({users:users})
+        } catch (error) {
+            res.status(500).json({message:"Internal Server Error"})
+        }
+    },
+
+    // ------------------------------------------------------------------Getting Users with Id--------------------------------------------------------------------------
+
+    getUserWithId:async(req,res)=>{
+        try {
+            const userId = req.body.userId;
+            const user = await userModel.findOne({_id:userId});
+            res.status(200).json({userDetails:user})
+        } catch (error) {
+            res.status(500).json({message:"Internal Server Error"})
+        }
+    },
+
+    // ------------------------------------------------------------------Getting Users with Id--------------------------------------------------------------------------
+  
+    getUserWithToken: async(req,res)=>{
+        try {
+            const user = req.userDetails
+            res.status(200).json({userDetails:user})
+        } catch (error) {
+            res.status(500).json({message:"Internal Server Error"})
+        }
+    },
+
+    // ------------------------------------------------------------------TEMPERORY POST DELETE--------------------------------------------------------------------------
+
+    temperoryPostDelete: async(req,res)=>{
+        try {
+            const postId = req.body.postId;
+            const userId = req.userDetails._id;
+            const temperoryPostDelete = await postModel.findOneAndUpdate({_id:postId,userId:userId},{$set:{ show:false} });
+            if(temperoryPostDelete) return res.status(200).json({message:"Your Post Will be Permenently Deleted After 7 days"});
+            else return res.status(401).json({message:'Unable to Delete post'});
+        } catch (error) {
+            res.status(500).json({message:"Internal Server Error"})
+        }
+    },
+
+
+    // ------------------------------------------------------------------PERMENENT POST DELETE--------------------------------------------------------------------------
+
+    permenentPostDelete: async(req,res)=>{
+        try {
+            const postId = req.body.postId;
+            const postDeleted = await postModel.findOneAndDelete({_id:postId});
+            if(postDeleted) return res.status(200).json({message:"Post Deleted Successfully"});
+            else return res.status(401).json({message:"Unable to delete the post"})
+        } catch (error) {
+            res.status(500).json({message:"Internal Server Error"})
+        }
+    },
+    // -----------------------------------------------------------------------FOLLOW-------------------------------------------------------------------------------
+
+    follow:async(req,res)=>{
+        try {
+            const follower = req.userDetails._id;
+            const userId = req.body.userId;
+            const followed = await userModel.findOneAndUpdate({_id:userId,followers:{$ne:follower}},{$addToSet:{followers:follower}});
+            const following = await userModel.findOneAndUpdate({_id:follower,following:{$ne:userId}},{$addToSet:{following:userId}});
+            if(followed && following) res.status(200).json({message:"Followed Successfully"});
+            else res.status(401).json({message:"Unable to follow this User"});
+        } catch (error) {
+            res.status(500).json({message:"Internal Server Error"});
+        }
+    },
+
+    // -----------------------------------------------------------------------UnFollow-------------------------------------------------------------------------------
+
+    unfollow:async(req,res)=>{
+        try {
+            const unfollower = req.userDetails._id;
+            const userId = req.body.userId;
+            const unfollowed = await userModel.findOneAndUpdate({_id:userId,followers:unfollower},{$pull:{followers:unfollower}})
+            const unfollowing = await userModel.findOneAndUpdate({_id:unfollower,following:userId},{$pull:{following:userId}})
+            if(unfollowed && unfollowing) res.status(200).json({message:"Unfollowed Successful"})
+            else res.status(401).json({message:"Unable to unfollow this User"})
+        } catch (error) {
+            res.status(500).json({message:"Internal Server Error"});
+        }
+    },
+
+    // ------------------------------------------------------------------GET FOLLOWERS COUNT-------------------------------------------------------------------------
+
+    getFollowersCount:async(req,res)=>{
+        try {
+            const userId = req.userDetails._id
+            const user = await userModel.aggregate([{$match:{_id:userId}},{$project:{followers:{$size:'$followers'}}}]);
+            if(user) res.status(200).json({followersCount:user[0].followers});
+            else res.status(404).json({message:"Unable to fetch followers count"})
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({message:"Internal Server Error"});
+        }
+    },
+
+    // ------------------------------------------------------------------GET POSTS COUNT-------------------------------------------------------------------------
+
+    getPostCount : async(req,res)=>{
+        try {
+            const userId = req.userDetails._id;
+            const postCount = await postModel.find({userId:userId,show:false}).count()
+            if(postCount) res.status(200).json({postCount:postCount})
+            else res.status(401).json({message:"No Post Found"})
+        } catch (error) {
+            res.status(500).json({message:"Internal Server Error"});
+        }
+    },
+
+    // ------------------------------------------------------------------Change Password-------------------------------------------------------------------------
+
+    changePassword : async(req,res)=>{
+        try {
+            const userId = req.userDetails._id;
+            const oldPassword = req.body.oldPassword;
+            const newPassword = req.body.newPassword;
+            const user = await userModel.findOne({_id:userId});
+
+            const passwordVerification = await bcrypt.compare(oldPassword,user.password);
+            const newPasswordMatchOld = await bcrypt.compare(newPassword,user.password);
+            if(newPasswordMatchOld) return res.status(401).json({message:"This is your current password"});
+            if(!passwordVerification) return res.status(401).json({message:"Old Password is wrong"});
+            const hashedPassword = await bcrypt.hash(newPassword,10);
+            const updatePassword = await userModel.findOneAndUpdate({_id:userId},{password:hashedPassword});
+
+            if(!updatePassword) res.status(401).json({message:"can't update the password"});
+            else res.status(200).json({message:"password Updated Successfully"});
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({message:"Internal Server Error"});
+        }
+    },
+
+    // ------------------------------------------------------------------Update User Model-------------------------------------------------------------------------
 
 
 };

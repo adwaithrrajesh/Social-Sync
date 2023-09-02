@@ -5,7 +5,7 @@ module.exports={
     createAccessToken:(userId)=>{
         try {          
             return new Promise((resolve)=>{
-                const AccessToken = jwt.sign({_id:userId},process.env.ACCESS_TOKEN_SECRET_KEY, { expiresIn: "2m"});
+                const AccessToken = jwt.sign({_id:userId},process.env.ACCESS_TOKEN_SECRET_KEY, { expiresIn: "2d"});
                 resolve(AccessToken)
             })
         } catch (error) {

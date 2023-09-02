@@ -35,7 +35,7 @@ const postSchema = mongoose.Schema({
     },
     show:{
         type:Boolean,
-        require:true
+        default:true
     }
 });
 
