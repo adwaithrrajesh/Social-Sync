@@ -52,6 +52,7 @@ module.exports ={
     },
 
     // --------------------------------------------------------------SCHEDULE POST DELETE---------------------------------------------------------------------
+   
     schedulePostDelete:(postId,userId)=>{
         // Inserting the schedule details in database
         return new Promise(async(resolve,reject)=>{
@@ -65,8 +66,8 @@ module.exports ={
                 console.log(error)
             }
         });
-    }
+    },
 
-
+    // ------------------------------------------------------------------SCHEDULE POST DELETE---------------------------------------------------------------------
 
 };

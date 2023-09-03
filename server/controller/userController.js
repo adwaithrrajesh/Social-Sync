@@ -5,7 +5,8 @@ const bcrypt = require('bcrypt');
 const tokenHelper = require('../helpers/tokenHelper');
 const jwt = require('jsonwebtoken');
 const postModel = require('../model/postModel');
-const scheduleDeletionModel = require('../model/scheduleDeletion')
+const scheduleDeletionModel = require('../model/scheduleDeletion'); 
+const repostModel = require('../model/respostModel')
 // Temperory Storage for User Details.
 let userPendingForSignup;
 
@@ -367,6 +368,59 @@ module.exports ={
         }
     },
 
-    // ----------------------------------------------------------------------------------------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------Repost-------------------------------------------------------------------------------
+    repost: async(req,res)=>{
+        try {
+            const userId = req.userDetails._id;
+            const ownerId = req.body.ownerId;
+            const postId = req.body.postId;
+
+            const AlreadyReposted = await repostModel.findOne({postId});
+            if(AlreadyReposted) return res.status(404).json({message:"Already Reposted this post"})
+
+            if(userId == ownerId) return res.status(401).json({message:"The User and owner cannot be 1 person"});
+            const newRepost = new repostModel({
+                userId:userId,
+                postId:postId,
+                ownerId:ownerId
+            }); 
+            const reposted = await newRepost.save();
+            if(reposted) res.status(200).json({message:"Reposted Successfully"});
+            else res.status(404).json({message:"Unable to repost"});
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({message:"Internal Server Error"});
+        }
+    },
+
+    // ---------------------------------------------------------------------------Get Reposts-------------------------------------------------------------------------------
+
+    getReposts: async(req,res)=>{
+        try {
+            const userId = req.userDetails._id;
+            const reposts =  await repostModel.find({ userId: userId }).populate('ownerId').populate('postId').exec();
+            if(reposts) return res.status(200).json({reposts:reposts});
+            else return res.status(404).json({message:"You didn't repost anything"})
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({message:"Internal Server Error"});
+        }
+    },
+
+    // ---------------------------------------------------------------------------REMOVE Reposts-------------------------------------------------------------------------------
+   
+    removeRepost: async(req,res)=>{
+        try {
+            const repostId = req.body.repostId;
+            const removePost = await repostModel.findByIdAndDelete({_id:repostId});
+            if(removePost) res.status(200).json({message:"Post Removed Successfully"});
+            else res.status(404).json({message:"Unable to remove repost"});
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({message:"Internal Server Error"});
+        }
+    },
+
+    // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 };
