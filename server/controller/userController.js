@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const tokenHelper = require('../helpers/tokenHelper');
 const jwt = require('jsonwebtoken');
 const postModel = require('../model/postModel');
+const scheduleDeletionModel = require('../model/scheduleDeletion')
 // Temperory Storage for User Details.
 let userPendingForSignup;
 
@@ -223,14 +224,30 @@ module.exports ={
         try {
             const postId = req.body.postId;
             const userId = req.userDetails._id;
+            const deletionAlreadyScheduled = await scheduleDeletionModel.findOne({postId:postId});
+            if(deletionAlreadyScheduled) return res.status(401).json({message:"You Have already Deleted The Post"})
             const temperoryPostDelete = await postModel.findOneAndUpdate({_id:postId,userId:userId},{$set:{ show:false} });
-            if(temperoryPostDelete) return res.status(200).json({message:"Your Post Will be Permenently Deleted After 7 days"});
+            const schedulePostDelete = await userHelper.schedulePostDelete(postId,userId);
+            if(temperoryPostDelete && schedulePostDelete) return res.status(200).json({message:"Your Post Will be Permenently Deleted After 7 days"});
             else return res.status(401).json({message:'Unable to Delete post'});
         } catch (error) {
-            res.status(500).json({message:"Internal Server Error"})
+            res.status(500).json({message:"Internal Server Error"});
         }
     },
 
+    // ------------------------------------------------------------------------Recover Post------------------------------------------------------------------------------
+
+    recoverPost: async(req,res)=>{
+        try {
+            const postId = req.body.postId;
+            const changeShowStatus = await postModel.findOneAndUpdate({_id:postId},{$set:{show:true}});
+            const removeFromDeletionSchedule = await scheduleDeletionModel.deleteOne({postId:postId});
+           if(changeShowStatus && removeFromDeletionSchedule) res.status(200).json({message:"Post recovered"});
+           else res.status(404).json({message:"Unable to Recover your post"});
+        } catch (error) {
+            res.status(500).json({message:"Internal Server Error"});
+        }
+    },
 
     // ------------------------------------------------------------------PERMENENT POST DELETE--------------------------------------------------------------------------
 
@@ -317,15 +334,39 @@ module.exports ={
             const hashedPassword = await bcrypt.hash(newPassword,10);
             const updatePassword = await userModel.findOneAndUpdate({_id:userId},{password:hashedPassword});
 
-            if(!updatePassword) res.status(401).json({message:"can't update the password"});
-            else res.status(200).json({message:"password Updated Successfully"});
+            if(!updatePassword) return res.status(401).json({message:"can't update the password"});
+            else return res.status(200).json({message:"password Updated Successfully"});
         } catch (error) {
             console.log(error)
             res.status(500).json({message:"Internal Server Error"});
         }
     },
+    // ------------------------------------------------------------------GetPostForHomeScreen-------------------------------------------------------------------------
 
-    // ------------------------------------------------------------------Update User Model-------------------------------------------------------------------------
+    getPostForHomeScreen: async(req,res)=>{
+        try {
+            const postsForHomeScreen = await postModel.find({show:true});
+            if(postsForHomeScreen) return res.status(200).json({postsForHomeScreen:postsForHomeScreen});
+            else return res.status(404).json({message:"No Post available"})
+        } catch (error) {
+            res.status(500).json({message:"Internal Server Error"});
+        }
+    },
 
+    // ------------------------------------------------------------------GetDeletionScheduledPosts-------------------------------------------------------------------------
+
+    getDeletionScheduledPosts: async(req,res)=>{
+        try {
+            const userId = req.userDetails._id;
+            const deletionScheduledPosts = await scheduleDeletionModel.find({userId:userId}).populate('postId');
+            if(deletionScheduledPosts) res.status(200).json({deletionScheduledPosts:deletionScheduledPosts});
+            else res.status(404).json({message:"No Post Available"})
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({message:"Internal Server Error"});
+        }
+    },
+
+    // ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 };

@@ -12,7 +12,8 @@ router.post('/login',controller.login);
 router.post('/addPost',userAuthentication,controller.addPost);
 router.post('/getUserWithId',controller.getUserWithId);
 router.post('/follow',userAuthentication,controller.follow);
-router.post('/unfollow',userAuthentication,controller.unfollow)
+router.post('/unfollow',userAuthentication,controller.unfollow);
+router.post('/recoverPost',userAuthentication,controller.recoverPost)
 
 // -------------------------------------------------------------PATCH METHODS--------------------------------------------------------------
 router.patch('/addComment',userAuthentication,controller.addComment);
@@ -20,15 +21,17 @@ router.patch('/likeComment',userAuthentication,controller.likeComment);
 router.patch('/likePost',userAuthentication,controller.likePost);
 router.patch('/unlikePost',userAuthentication,controller.unlikePost);
 router.patch('/unlikeComment',userAuthentication,controller.unlikeComment);
-router.patch('/temperoryPostDelete',userAuthentication,controller.temperoryPostDelete)
-router.patch('/changePassword',userAuthentication,controller.changePassword)
+router.patch('/temperoryPostDelete',userAuthentication,controller.temperoryPostDelete);
+router.patch('/changePassword',userAuthentication,controller.changePassword);
 
 // -------------------------------------------------------------GET METHODS--------------------------------------------------------------
 router.get('/refreshToken',controller.refreshToken);
 router.get('/getUsers',controller.getUsers);
 router.get('/getUserWithToken',userAuthentication,controller.getUserWithToken);
 router.get('/getFollowersCount',userAuthentication,controller.getFollowersCount);
-router.get('/getPostCount',userAuthentication,controller.getPostCount)
+router.get('/getPostCount',userAuthentication,controller.getPostCount);
+router.get('/getPostForHomeScreen',userAuthentication,controller.getPostForHomeScreen);
+router.get('/getDeletionScheduledPosts',userAuthentication,controller.getDeletionScheduledPosts)
 
 // -----------------------------------------------------------Delete Method------------------------------------------------------------
 router.delete('/permenentPostDelete',userAuthentication,controller.permenentPostDelete)

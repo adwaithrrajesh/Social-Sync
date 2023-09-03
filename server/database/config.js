@@ -1,8 +1,12 @@
 const mongoose = require('mongoose')
 require('dotenv').config()
+require('../helpers/cronJobHelper')
 
 // Connecting mongoose 
-mongoose.connect(process.env.MONGO_URL)
+mongoose.connect(process.env.MONGO_URL,{
+    useNewUrlParser:true,
+    useUnifiedTopology: true
+})
 
 const connection = mongoose.connection
 
