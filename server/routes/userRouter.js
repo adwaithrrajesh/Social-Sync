@@ -13,7 +13,8 @@ router.post('/addPost',userAuthentication,controller.addPost);
 router.post('/getUserWithId',controller.getUserWithId);
 router.post('/follow',userAuthentication,controller.follow);
 router.post('/unfollow',userAuthentication,controller.unfollow);
-router.post('/recoverPost',userAuthentication,controller.recoverPost)
+router.post('/recoverPost',userAuthentication,controller.recoverPost);
+router.post('/repost',userAuthentication,controller.repost)
 
 // -------------------------------------------------------------PATCH METHODS--------------------------------------------------------------
 router.patch('/addComment',userAuthentication,controller.addComment);
@@ -31,10 +32,12 @@ router.get('/getUserWithToken',userAuthentication,controller.getUserWithToken);
 router.get('/getFollowersCount',userAuthentication,controller.getFollowersCount);
 router.get('/getPostCount',userAuthentication,controller.getPostCount);
 router.get('/getPostForHomeScreen',userAuthentication,controller.getPostForHomeScreen);
-router.get('/getDeletionScheduledPosts',userAuthentication,controller.getDeletionScheduledPosts)
+router.get('/getDeletionScheduledPosts',userAuthentication,controller.getDeletionScheduledPosts);
+router.get('/getReposts',userAuthentication,controller.getReposts);
 
 // -----------------------------------------------------------Delete Method------------------------------------------------------------
-router.delete('/permenentPostDelete',userAuthentication,controller.permenentPostDelete)
+router.delete('/permenentPostDelete',userAuthentication,controller.permenentPostDelete);
+router.delete('/removeRepost',userAuthentication,controller.removeRepost)
 
 
 module.exports = router;
