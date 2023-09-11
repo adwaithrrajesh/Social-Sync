@@ -14,7 +14,11 @@ router.post('/getUserWithId',controller.getUserWithId);
 router.post('/follow',userAuthentication,controller.follow);
 router.post('/unfollow',userAuthentication,controller.unfollow);
 router.post('/recoverPost',userAuthentication,controller.recoverPost);
-router.post('/repost',userAuthentication,controller.repost)
+router.post('/repost',userAuthentication,controller.repost);
+router.post('/initializePayment',userAuthentication,controller.initializePayment);
+router.post('/verifyPayment',userAuthentication,controller.verifyPayment);
+
+
 
 // -------------------------------------------------------------PATCH METHODS--------------------------------------------------------------
 router.patch('/addComment',userAuthentication,controller.addComment);

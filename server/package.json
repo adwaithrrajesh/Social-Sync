@@ -23,7 +23,8 @@
     "node-cron": "^3.0.2",
     "nodemailer": "^6.9.2",
     "nodemon": "^2.0.22",
-    "otp-generator": "^4.0.1"
+    "otp-generator": "^4.0.1",
+    "razorpay": "^2.9.2"
   },
   "devDependencies": {
     "eslint-config-standard": "^17.0.0",
