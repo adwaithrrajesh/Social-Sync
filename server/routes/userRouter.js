@@ -1,7 +1,8 @@
 const { Router } = require('express');
 const router = Router();
 const controller = require('../controller/userController');
-const {userAuthentication} = require('../middleware/tokenMiddleware')
+const {userAuthentication} = require('../middleware/tokenMiddleware');
+const userController = require('../controller/userController');
 
 
 // -------------------------------------------------------------POST METHODS--------------------------------------------------------------
@@ -17,7 +18,8 @@ router.post('/recoverPost',userAuthentication,controller.recoverPost);
 router.post('/repost',userAuthentication,controller.repost);
 router.post('/initializePayment',userAuthentication,controller.initializePayment);
 router.post('/verifyPayment',userAuthentication,controller.verifyPayment);
-
+router.post('/addMessage',userAuthentication,controller.addMessage);
+router.post('/getMessages',userAuthentication,controller.getMessages)
 
 
 // -------------------------------------------------------------PATCH METHODS--------------------------------------------------------------
@@ -41,7 +43,8 @@ router.get('/getReposts',userAuthentication,controller.getReposts);
 
 // -----------------------------------------------------------Delete Method------------------------------------------------------------
 router.delete('/permenentPostDelete',userAuthentication,controller.permenentPostDelete);
-router.delete('/removeRepost',userAuthentication,controller.removeRepost)
+router.delete('/removeRepost',userAuthentication,controller.removeRepost);
+router.delete('/unsendMessage',userAuthentication,controller.unsendMessage);
 
 
 module.exports = router;
