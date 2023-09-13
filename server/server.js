@@ -21,8 +21,12 @@ app.use(cors({
 app.use(morgan('dev'));
 
 // -------------Cookie Parser--------------
-app.use(cookieParser())
+app.use(cookieParser());
 
+
+// -------------------Trusting Proxy to Get the User Ip---------------
+
+app.set('trust proxy', true);
 
 
 //-------------------------------------------- PORT --------------------------------------------

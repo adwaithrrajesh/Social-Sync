@@ -1,5 +1,6 @@
 const otpHelper = require('../helpers/otpHelper');
 const userHelper = require('../helpers/userHelper');
+const securityHelper = require('../helpers/securityHelper')
 const userModel = require('../model/userModel');
 const bcrypt = require('bcrypt');
 const tokenHelper = require('../helpers/tokenHelper');
@@ -9,6 +10,8 @@ const scheduleDeletionModel = require('../model/scheduleDeletion');
 const repostModel = require('../model/respostModel')
 const Razorpay = require('razorpay');
 const messageModel = require('../model/messageModel');
+const dailyLifeModel = require('../model/dailyLifeModel');
+const mongoose  = require('mongoose')
 // Temperory Storage for User Details.
 let userPendingForSignup;
 
@@ -52,17 +55,28 @@ module.exports ={
         try {     
             const {email,password} = req.body;
             const emailExist = await userModel.findOne({email:email});
+            const ipAddress = req.ip
+
             if(!emailExist) return res.status(404).json({message:"Email Doesnot exist"});
             const passwordCorrect = await bcrypt.compare(password,emailExist.password);
             if(!passwordCorrect) return res.status(404).json({message:"Incorrect Password"});
+
+            // Creating Access and refresh token 
             const accessToken = await tokenHelper.createAccessToken(emailExist._id);
             const refreshToken = await tokenHelper.createRefreshToken(emailExist._id);
+
             // Assigning refresh token in http-only cookie 
-             res.cookie('jwt', refreshToken, { httpOnly: true, 
-             sameSite: 'None', secure: true, 
-             maxAge: 24 * 60 * 60 * 1000 });
-            // Returning Access Token
-            res.status(200).json({accessToken:accessToken, message:"Login successful"})
+            res.cookie('jwt', refreshToken, { httpOnly: true, 
+                sameSite: 'None', secure: true, 
+                maxAge: 24 * 60 * 60 * 1000 });
+                // Returning Access Token
+                res.status(200).json({accessToken:accessToken, message:"Login successful"});
+
+                // Finding The location of the Login attempt and send it to User Email
+                const locationData = await securityHelper.findLocationData(ipAddress);
+                const googleMapUrl = await securityHelper.getGoogleMapUrl(locationData);
+                // Sending Awareness Mail to user
+                await securityHelper.sendLoginDetectionMailToUser(locationData,googleMapUrl,email);
         } catch (error) {
             res.status(500).json({message:"Internal Server Error"})
         }
@@ -516,7 +530,116 @@ module.exports ={
         } catch (error) {
             res.status(500).json({message:"Internal Server Error"})
         }
-    }
+    },
 
+    // ------------------------------------------------------------------------------Daily Life-----------------------------------------------------------------------------------------------------
 
+    createDailyLife: async(req,res)=>{
+        try {         
+            const content = req.body.content;
+            const ownerId = req.userDetails._id;
+            const newDailyLife = new dailyLifeModel({ownerId:ownerId,content:content});
+            const createdDailyLife = newDailyLife.save();
+            if(createdDailyLife) return res.status(200).json({message:"Daily Life Created Successfully"});
+            else return res.status(404).json({message:"Unable to create Daily life"});
+        } catch (error) {
+            res.status(500).json({message:"Internal Server Error"});
+        }
+    },
+
+    // ------------------------------------------------------------------------------View Daily Life-----------------------------------------------------------------------------------------------------
+
+    viewDailyLife: async(req,res)=>{
+        try {
+            const viewerId = req.userDetails._id;
+            const dailyLifeId = req.body.dailyLifeId;
+            const update = await dailyLifeModel.findOneAndUpdate({ _id: dailyLifeId },{ $addToSet: { viewers: viewerId } },{ new: true });
+            return res.status(200).json({message:"Daily Life Viewed"})
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Internal Server Error" });
+        }
+        
+    },
+
+    // ------------------------------------------------------------------------------Like Daily Life-----------------------------------------------------------------------------------------------------
+
+    likeDailyLife: async(req,res)=>{
+        try {
+            const likedUser = req.userDetails._id;
+            const dailyLifeId = req.body.dailyLifeId;
+            const update = await dailyLifeModel.findOneAndUpdate({_id:dailyLifeId},{$addToSet:{likes:likedUser}},{new:true});
+            return res.status(200).json({message:"Daily Life liked"})
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Internal Server Error" });
+        }
+        
+    },
+
+    // ------------------------------------------------------------------------------Get Daily Lifes-----------------------------------------------------------------------------------------------------
+
+    getDailyLife:async(req,res)=>{
+        try {
+            const getDailyLife = await dailyLifeModel.find().populate('ownerId');
+            return res.status(200).json({dailyLives:getDailyLife});
+        } catch (error) {
+            res.status(500).json({ message: "Internal Server Error" });
+        }
+    },
+    
+    // ------------------------------------------------------------------------------ Get Daily Life Using Id-----------------------------------------------------------------------------------------------------
+
+    getDailyLifeUsingId: async(req,res)=>{
+        try {
+            const dailyLifeId = req.body.dailyLifeId;
+            const dailyLife = await dailyLifeModel.findOneAndUpdate({_id:dailyLifeId});
+            if(dailyLife) return res.status(200).json({dailyLife:dailyLife});
+            else return res.status(404).json({message:"No Daily life Found"})
+        } catch (error) {
+            res.status(500).json({message:"Internal Server error"})
+        }
+    },
+
+    // ------------------------------------------------------------------------------getDailyLifeWithUserId------------------------------------------------------------------------------------------------------
+
+    getDailyLifeWithUserId: async(req,res)=>{
+        try {      
+            const ownerId = req.userDetails._id;
+            const dailyLife = await dailyLifeModel.find({ownerId:ownerId});
+            if(dailyLife) return res.status(200).json({dailyLife:dailyLife});
+            else return res.status(404).json({message:"No Daily Life Found"})
+        } catch (error) {
+            res.status(500).json({message:"Internal Server error"})
+        }
+    },
+
+    // ------------------------------------------------------------------------------Get daily life likes------------------------------------------------------------------------------------------------------
+
+    getDailyLifeLikes: async(req,res)=>{
+        try {
+            const dailyLifeId = req.body.dailyLifeId ;
+            const dailyLife = await dailyLifeModel.findOne({_id:dailyLifeId}).populate('likes');
+            if(dailyLife) return res.status(200).json({dailyLifeLikes:dailyLife.likes});
+            else return res.status(404).json({message:"No likes found"})
+        } catch (error) {
+            res.status(500).json({message:"Internal Server Error"})
+        }
+    },
+
+    // ------------------------------------------------------------------------------Get daily life Viewers------------------------------------------------------------------------------------------------------
+    
+    getDailyLifeViews: async(req,res)=>{
+        try {
+            const dailyLifeId = req.body.dailyLifeId ;
+            const dailyLife = await dailyLifeModel.findOne({_id:dailyLifeId}).populate('viewers');
+            if(dailyLife) return res.status(200).json({dailyLifeViewers:dailyLife.viewers});
+            else return res.status(404).json({message:"No Viewers found"});
+        } catch (error) {
+            res.status(500).json({message:"Internal Server Error"});
+        }
+    },
+
+    // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    
 };
