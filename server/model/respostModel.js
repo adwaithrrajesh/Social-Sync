@@ -17,6 +17,6 @@ const repostSchema = new mongoose.Schema({
         ref:'users',
         require:true
     }
-})
+});
 
-module.exports = mongoose.model('reposts',repostSchema)
+module.exports = mongoose.model('reposts',repostSchema);

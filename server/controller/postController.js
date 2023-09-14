@@ -46,15 +46,15 @@ module.exports ={
             const commentId = req.body.commentId;
             const postId = req.body.postId;
             const userId = req.userDetails._id; 
-            const likeComment = await postHelper.likeComment(commentId,postId,userId)
+            const likeComment = await postHelper.likeComment(commentId,postId,userId);
             if(likeComment){
-                res.status(200).json({message:"comment liked Successfully"})
+                res.status(200).json({message:"comment liked Successfully"});
             }else{
-                res.status(401).json({message:"Already like the comment"})
+                res.status(401).json({message:"Already like the comment"});
             }
         } catch (error) {
             console.log(error)
-            res.status(500).json({message:"Internal Server Error"})
+            res.status(500).json({message:"Internal Server Error"});
         }
     },
 
@@ -67,15 +67,15 @@ module.exports ={
                 const commentId = req.body.commentId;
                 const postId = req.body.postId;
                 const userId = req.userDetails._id; 
-                const unlikeComment = await postHelper.unlikeComment(commentId,postId,userId)
+                const unlikeComment = await postHelper.unlikeComment(commentId,postId,userId);
                 if(unlikeComment){
-                    res.status(200).json({message:"comment Unliked Successfully"})
+                    res.status(200).json({message:"comment Unliked Successfully"});
                 }else{
-                    res.status(401).json({message:"Already Unliked the comment"})
+                    res.status(401).json({message:"Already Unliked the comment"});
                 }
             } catch (error) {
                 console.log(error)
-                res.status(500).json({message:"Internal Server Error"})
+                res.status(500).json({message:"Internal Server Error"});
             }
         },
 

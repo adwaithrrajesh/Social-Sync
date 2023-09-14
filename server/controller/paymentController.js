@@ -28,7 +28,7 @@ module.exports={
               });
         } catch (error) {
             console.log(error)
-            res.status(500).json({message:"Internal Server Error"})
+            res.status(500).json({message:"Internal Server Error"});
         }
     },
 
@@ -50,7 +50,7 @@ module.exports={
               res.status(404).json({ message: "Unable to book an Appointment" });
             }
         } catch (error) {
-            res.status(500).json({message:"Internal Server Error"})
+            res.status(500).json({message:"Internal Server Error"});
         }
     }
 }

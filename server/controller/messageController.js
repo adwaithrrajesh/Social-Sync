@@ -15,7 +15,7 @@ module.exports={
             else return res.status(404).json({message:"Unable to send Message"});
         } catch (error) {
             console.log(error)
-            res.status(500).json({message:"Internal Server Error"})
+            res.status(500).json({message:"Internal Server Error"});
         }
 
     },
@@ -28,7 +28,7 @@ module.exports={
             if(messageDeleted) return res.status(200).json({message:"Message Unsend Successfully"});
             else return res.status(404).json({message:"Unable to unsend Message"});
         } catch (error) {
-            res.status(500).json({message:"Internal Server Error"})
+            res.status(500).json({message:"Internal Server Error"});
         }
     },
 
@@ -37,11 +37,11 @@ module.exports={
     getMessages: async(req,res)=>{
         try {
             const senderId = req.userDetails._id;
-            const receiverId = req.body.userId
+            const receiverId = req.body.userId;
             const messages = await messageModel.find({$or: [{ sender: senderId, receiver: receiverId },{ sender: receiverId, receiver: senderId }],}).sort({ createdAt: 1 });
-            res.status(200).json({messages})
+            res.status(200).json({messages});
         } catch (error) {
-            res.status(500).json({message:"Internal Server Error"})
+            res.status(500).json({message:"Internal Server Error"});
         }
     },
 
