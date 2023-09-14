@@ -1,6 +1,5 @@
 const scheduleDeletionModel = require('../model/scheduleDeletion');
 const cron = require('node-cron');
-const mongoose = require('mongoose')
 const postModel = require('../model/postModel');
 const userModel = require('../model/userModel');
 
