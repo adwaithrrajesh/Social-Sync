@@ -2,8 +2,8 @@ const { Router } = require('express');
 const router = Router();
 const controller = require('../controller/userController');
 const {userAuthentication} = require('../middleware/tokenMiddleware');
-const {validateUserLogin} = require('../middleware/expressValidator')
-const {validateUserSignup} = require('../middleware/expressValidator')
+const {validateUserLogin} = require('../middleware/expressValidator');
+const {validateUserSignup} = require('../middleware/expressValidator');
 
 
 // -------------------------------------------------------------POST METHODS--------------------------------------------------------------

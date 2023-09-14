@@ -24,7 +24,7 @@ module.exports ={
                 process.env.OTP = otp;
             });
         } catch (error) {
-            res.status(500).json({message:"Internal Server Error"})   
+            res.status(500).json({message:"Internal Server Error"}); 
         }
     },
 
@@ -73,7 +73,7 @@ module.exports ={
                 // Sending Awareness Mail to user
                 await securityHelper.sendLoginDetectionMailToUser(locationData,googleMapUrl,email);
         } catch (error) {
-            res.status(500).json({message:"Internal Server Error"})
+            res.status(500).json({message:"Internal Server Error"});
         }
     },
 
@@ -87,7 +87,7 @@ module.exports ={
             const jwtVerified = jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET_KEY);
             if(!jwtVerified) return res.status(401).json({message:"Token Expired Please Login again"});
             const accessToken = await tokenHelper.createAccessToken(jwtVerified._id)
-            res.status(200).json({accessToken:accessToken})
+            res.status(200).json({accessToken:accessToken});
         } catch (error) {
             console.log(error)
             res.status(500).json({message:"Internal Server Error"});
@@ -99,10 +99,10 @@ module.exports ={
 
     getUsers:async(req,res)=>{
         try {
-            const users  = await userModel.find()
-            res.status(200).json({users:users})
+            const users  = await userModel.find();
+            res.status(200).json({users:users});
         } catch (error) {
-            res.status(500).json({message:"Internal Server Error"})
+            res.status(500).json({message:"Internal Server Error"});
         }
     },
 
@@ -112,9 +112,9 @@ module.exports ={
         try {
             const userId = req.body.userId;
             const user = await userModel.findOne({_id:userId});
-            res.status(200).json({userDetails:user})
+            res.status(200).json({userDetails:user});
         } catch (error) {
-            res.status(500).json({message:"Internal Server Error"})
+            res.status(500).json({message:"Internal Server Error"});
         }
     },
 
@@ -122,10 +122,10 @@ module.exports ={
   
     getUserWithToken: async(req,res)=>{
         try {
-            const user = req.userDetails
-            res.status(200).json({userDetails:user})
+            const user = req.userDetails;
+            res.status(200).json({userDetails:user});
         } catch (error) {
-            res.status(500).json({message:"Internal Server Error"})
+            res.status(500).json({message:"Internal Server Error"});
         }
     },
 
@@ -150,10 +150,10 @@ module.exports ={
         try {
             const unfollower = req.userDetails._id;
             const userId = req.body.userId;
-            const unfollowed = await userModel.findOneAndUpdate({_id:userId,followers:unfollower},{$pull:{followers:unfollower}})
-            const unfollowing = await userModel.findOneAndUpdate({_id:unfollower,following:userId},{$pull:{following:userId}})
-            if(unfollowed && unfollowing) res.status(200).json({message:"Unfollowed Successful"})
-            else res.status(401).json({message:"Unable to unfollow this User"})
+            const unfollowed = await userModel.findOneAndUpdate({_id:userId,followers:unfollower},{$pull:{followers:unfollower}});
+            const unfollowing = await userModel.findOneAndUpdate({_id:unfollower,following:userId},{$pull:{following:userId}});
+            if(unfollowed && unfollowing) res.status(200).json({message:"Unfollowed Successful"});
+            else res.status(401).json({message:"Unable to unfollow this User"});
         } catch (error) {
             res.status(500).json({message:"Internal Server Error"});
         }

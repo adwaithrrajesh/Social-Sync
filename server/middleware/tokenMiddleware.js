@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
-const userModel = require('../model/userModel')
-require('dotenv').config
+const userModel = require('../model/userModel');
+require('dotenv').config;
 
 
 module.exports={
@@ -18,7 +18,7 @@ module.exports={
                 res.status(401).json({message:"Token Expired Please Login Again"});
             }
         } catch (error) {
-            res.status(500).json({message:"Internal Server Error"})
+            res.status(500).json({message:"Internal Server Error"});
         }
     }
 }
