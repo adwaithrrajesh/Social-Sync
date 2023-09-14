@@ -4,8 +4,12 @@ const morgan  = require('morgan');
 require('./database/config');
 const app = express();
 const userRouter = require('./routes/userRouter');
+const postRouter = require('./routes/postRouter');
+const messageRouter = require('./routes/messageRouter')
+const paymentRouter = require('./routes/paymentRoute')
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
+
 
 //------------ Requiring DOTENV -----------------
 dotenv.config();
@@ -36,7 +40,9 @@ const port = process.env.PORT;
 // -------------------------------------------SPECIFYING ROUTE -------------------------------
 
 app.use('/api',userRouter);
-
+app.use('/api/post',postRouter);
+app.use('/api/message',messageRouter);
+app.use('/api/payment',paymentRouter)
 //----------------------------------------------- STARTING SERVER -------------------------------------
 
 app.listen(port,()=>{console.log(`server started at port ${port}`);});
