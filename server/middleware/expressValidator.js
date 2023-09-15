@@ -1,6 +1,6 @@
 const { body, validationResult } = require('express-validator');
 
-
+// User login Validation using express validator
 const validateUserLogin = [
   body('email').isEmail().withMessage('Email is not valid'),
   body('password').isLength({ min: 5 }).withMessage('Password must be at least 5 characters long.').trim(), 
@@ -13,6 +13,7 @@ const validateUserLogin = [
   },
 ];
 
+// User Signup Validation using express validator
 const validateUserSignup = [
   body('firstName').notEmpty().isString().withMessage('First name is required.'),
   body('lastName').notEmpty().isString().withMessage('Last name is required'),
