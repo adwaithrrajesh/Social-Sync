@@ -42,7 +42,7 @@ const port = process.env.PORT;
 app.use('/api',userRouter);
 app.use('/api/post',postRouter);
 app.use('/api/message',messageRouter);
-app.use('/api/payment',paymentRouter)
+app.use('/api/payment',paymentRouter);
 //----------------------------------------------- STARTING SERVER -------------------------------------
 
 app.listen(port,()=>{console.log(`server started at port ${port}`);});
