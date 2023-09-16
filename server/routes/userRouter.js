@@ -31,10 +31,11 @@ router.patch('/likeDailyLife',userAuthentication,controller.likeDailyLife);
 router.get('/refreshToken',controller.refreshToken);
 router.get('/getUsers',controller.getUsers);
 router.get('/getUserWithToken',userAuthentication,controller.getUserWithToken);
+router.get('/getFollowers',userAuthentication,controller.getFollowers);
 router.get('/getFollowersCount',userAuthentication,controller.getFollowersCount);
+router.get('/getFollowings',userAuthentication,controller.getFollowing);
 router.get('/getDailyLife',userAuthentication,controller.getDailyLife);
 router.get('/getDailyLifeWithUserId',userAuthentication,controller.getDailyLifeWithUserId);
-
 
 
 
