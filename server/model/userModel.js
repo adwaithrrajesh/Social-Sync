@@ -22,10 +22,12 @@ const userSchema = mongoose.Schema({
         require:true
     },
     followers:{
-        type:Array
+        type:Array,
+        ref:'users'
     },
     following:{
-        type:Array
+        type:Array,
+        ref:'users'
     },
     verificationBadge:{
         type:Date

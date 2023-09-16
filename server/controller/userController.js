@@ -307,6 +307,28 @@ module.exports ={
         }
     },
 
-    // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    
+    // -------------------------------------------------------------------------------------getFollowers----------------------------------------------------------------------------------------------------------------------
+
+    getFollowers: async(req,res)=>{
+        try {
+            const userId = req.userDetails._id;
+            const followers = await userModel.findOne({_id:userId}).populate('followers');
+            return res.status(200).json({followers:followers});
+        } catch (error) {
+            res.status(500).json({message:"Internal server error"})
+        }
+    },
+
+    // -------------------------------------------------------------------------------------get Following----------------------------------------------------------------------------------------------------------------------
+
+    getFollowing:async(req,res)=>{
+        try {
+            const userId = req.userDetails._id
+            const following = await userModel.findOne({_id:userId}).populate('following');
+            return res.status(200).json({following:following});
+        } catch (error) {
+            res.status(500).json({message:"Internal server error"});
+        }
+    }
+
 };
