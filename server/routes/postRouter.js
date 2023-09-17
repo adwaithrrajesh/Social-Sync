@@ -27,7 +27,7 @@ router.get('/getPostForHomeScreen',userAuthentication,controller.getPostForHomeS
 router.get('/getDeletionScheduledPosts',userAuthentication,controller.getDeletionScheduledPosts);
 router.get('/getReposts',userAuthentication,controller.getReposts);
 
-// -----------------------------------------------------------Delete---------------------------------------------------------------
+// -----------------------------------------------------------Delete METHODS---------------------------------------------------------------
 
 router.delete('/permenentPostDelete',userAuthentication,controller.permenentPostDelete);
 router.delete('/removeRepost',userAuthentication,controller.removeRepost);
