@@ -20,6 +20,7 @@ router.post('/getDailyLifeUsingId',userAuthentication,controller.getDailyLifeUsi
 router.post('/getDailyLifeLikes',userAuthentication,controller.getDailyLifeLikes);
 router.post('/getDailyLifeViews',userAuthentication,controller.getDailyLifeViews);
 
+
 // -------------------------------------------------------------PATCH METHODS--------------------------------------------------------------
 
 router.patch('/changePassword',userAuthentication,controller.changePassword);
@@ -36,7 +37,6 @@ router.get('/getFollowersCount',userAuthentication,controller.getFollowersCount)
 router.get('/getFollowings',userAuthentication,controller.getFollowing);
 router.get('/getDailyLife',userAuthentication,controller.getDailyLife);
 router.get('/getDailyLifeWithUserId',userAuthentication,controller.getDailyLifeWithUserId);
-
 
 
 module.exports = router;
