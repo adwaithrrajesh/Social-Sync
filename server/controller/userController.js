@@ -18,13 +18,13 @@ module.exports ={
         try {            
             userPendingForSignup = { ...req.body };
             const emailExist = await userModel.findOne({email:userPendingForSignup.email});
-            if(emailExist) return res.status(404).json({message:"Email Already Exist"});
+            if(emailExist) return res.status(404).json({message:'Email Already Exist'});
             await otpHelper.sendOtp(userPendingForSignup.email).then((otp)=>{
                 res.status(200).json({message:'Email Sent Successfully'});
                 process.env.OTP = otp;
             });
         } catch (error) {
-            res.status(500).json({message:"Internal Server Error"}); 
+            res.status(500).json({message:'Internal Server Error'}); 
         }
     },
 
@@ -32,8 +32,8 @@ module.exports ={
   
     verifyOtp: async(req,res)=>{
         try {
-        const {otp} = req.body;
-        if(otp == process.env.OTP){
+            const {otp} = req.body;
+            if(otp == process.env.OTP){
                 await userHelper.doSignup(userPendingForSignup);
                 res.status(200).json('User Registered Successfully');
             }else{
@@ -50,7 +50,7 @@ module.exports ={
         try {     
             const {email,password} = req.body;
             const emailExist = await userModel.findOne({email:email});
-            const ipAddress = req.ip
+            const ipAddress = req.ip;
 
             if(!emailExist) return res.status(404).json({message:"Email Doesnot exist"});
             const passwordCorrect = await bcrypt.compare(password,emailExist.password);
@@ -64,8 +64,8 @@ module.exports ={
             res.cookie('jwt', refreshToken, { httpOnly: true, 
                 sameSite: 'None', secure: true, 
                 maxAge: 24 * 60 * 60 * 1000 });
-                // Returning Access Token
-                res.status(200).json({accessToken:accessToken, message:"Login successful"});
+            // Returning Access Token
+            res.status(200).json({accessToken:accessToken, message:"Login successful"});
 
                 // Finding The location of the Login attempt and send it to User Email
                 const locationData = await securityHelper.findLocationData(ipAddress);
